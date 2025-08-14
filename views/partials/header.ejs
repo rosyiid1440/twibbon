@@ -1,0 +1,62 @@
+<!-- views/partials/header.ejs -->
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="https://sman1balongpanggang.sch.id/images/logo.png" type="image/x-icon">
+    <title>
+        <%= typeof title !=='undefined' ? title : 'SMANIBA Twibbon' %> - SMANIBA Twibbon
+    </title>
+    <!-- Memuat Tailwind CSS dari CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <style>
+        /* Custom styles untuk slider, karena stylingnya lebih kompleks */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            /* blue-600 */
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            /* blue-600 */
+            cursor: pointer;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<!-- 
+  PERUBAHAN: 
+  - flex: Menjadikan body sebagai flex container.
+  - flex-col: Mengatur item di dalamnya (header, main, footer) secara vertikal.
+  - min-h-screen: Memastikan body memiliki tinggi minimal setinggi layar.
+-->
+
+<body class="bg-slate-100 text-slate-800 flex flex-col min-h-screen">
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-blue-600">
+                SMANIBA Twibbon
+            </a>
+            <div class="space-x-4">
+                <a href="/" class="text-slate-600 hover:text-blue-600 transition-colors">Home</a>
+                <a href="/admin/dashboard" class="text-slate-600 hover:text-blue-600 transition-colors">Admin</a>
+            </div>
+        </nav>
+    </header>
+    <!-- 
+      PERUBAHAN: 
+      - flex-grow: Membuat elemen main mengisi sisa ruang yang tersedia, 
+                   mendorong footer ke bawah.
+    -->
+    <main class="container mx-auto px-6 py-8 flex-grow">

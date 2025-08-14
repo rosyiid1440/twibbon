@@ -1,0 +1,38 @@
+# Ketergantungan dan paket
+/node_modules
+
+# File environment
+# JANGAN PERNAH MENGIRIM FILE .env KE REPOSITORI PUBLIK
+.env
+
+# File database
+# Abaikan database sesi dan database utama jika tidak ingin dimasukkan
+/db/sessions.sqlite
+/db/database.sqlite
+
+# Folder upload
+# Biasanya, file yang diunggah pengguna tidak dimasukkan ke Git
+# Kosongkan baris ini jika Anda ingin menyertakan twibbon default
+/uploads/
+
+# Log
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# File sistem operasi
+.DS_Store
+Thumbs.db
+
+# File konfigurasi editor/IDE
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
