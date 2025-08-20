@@ -24,7 +24,7 @@ module.exports = function (keycloak) {
     });
 
     // Halaman Dashboard (dilindungi oleh Keycloak + Peran)
-    router.get('/dashboard', protectWithRole, (req, res) => {
+    router.get('/dashboard', protectWithAnyRole, (req, res) => {
         db.all("SELECT * FROM twibbons ORDER BY created_at DESC", [], (err, rows) => {
             if (err) {
                 return res.status(500).send("Gagal mengambil data twibbon.");
@@ -34,7 +34,7 @@ module.exports = function (keycloak) {
     });
 
     // Proses Upload Twibbon (juga dilindungi oleh peran)
-    router.post('/upload', protectWithRole, (req, res) => {
+    router.post('/upload', protectWithAnyRole, (req, res) => {
         if (!req.files || Object.keys(req.files).length === 0 || !req.files.twibbonFile) {
             return res.status(400).send('Tidak ada file yang diunggah.');
         }
