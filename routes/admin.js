@@ -5,9 +5,26 @@ const db = require('../database');
 
 // Terima instance keycloak dari server.js
 module.exports = function (keycloak) {
-    // Halaman Dashboard (dilindungi oleh Keycloak)
-    // keycloak.protect() akan otomatis mengarahkan ke halaman login Keycloak jika belum login
-    router.get('/dashboard', keycloak.protect(), (req, res) => {
+    // Ambil nama peran dari environment variable
+    const adminRoles = (process.env.KEYCLOAK_ADMIN_ROLES || 'superadmin')
+        .split(',')
+        .map(role => role.trim());
+
+    // Middleware untuk memeriksa apakah pengguna memiliki SALAH SATU dari peran yang diizinkan.
+    const protectWithAnyRole = keycloak.protect((token, req) => {
+        // Loop melalui setiap peran yang diizinkan
+        for (const role of adminRoles) {
+            // Jika token memiliki peran realm tersebut, izinkan akses
+            if (token.hasRealmRole(role)) {
+                return true;
+            }
+        }
+        // Jika setelah dicek semua peran tidak ada yang cocok, tolak akses
+        return false;
+    });
+
+    // Halaman Dashboard (dilindungi oleh Keycloak + Peran)
+    router.get('/dashboard', protectWithRole, (req, res) => {
         db.all("SELECT * FROM twibbons ORDER BY created_at DESC", [], (err, rows) => {
             if (err) {
                 return res.status(500).send("Gagal mengambil data twibbon.");
@@ -16,8 +33,8 @@ module.exports = function (keycloak) {
         });
     });
 
-    // Proses Upload Twibbon (juga dilindungi)
-    router.post('/upload', keycloak.protect(), (req, res) => {
+    // Proses Upload Twibbon (juga dilindungi oleh peran)
+    router.post('/upload', protectWithRole, (req, res) => {
         if (!req.files || Object.keys(req.files).length === 0 || !req.files.twibbonFile) {
             return res.status(400).send('Tidak ada file yang diunggah.');
         }
