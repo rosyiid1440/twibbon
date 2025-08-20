@@ -3,8 +3,8 @@ const express = require('express');
 const path = require('path');
 const fileUpload = require('express-fileupload');
 const session = require('express-session');
-const SQLiteStore = require('connect-sqlite3')(session);
-const db = require('./database'); // Inisialisasi database
+const Keycloak = require('keycloak-connect');
+const db = require('./database');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -14,27 +14,42 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.static(path.join(__dirname, 'public')));
-// Membuat folder uploads/twibbons dapat diakses secara publik
 app.use('/twibbons', express.static(path.join(__dirname, 'uploads/twibbons')));
-
 app.use(express.urlencoded({ extended: true }));
 app.use(fileUpload());
 
-// Session Middleware
+// Inisialisasi Session Store (diperlukan oleh Keycloak)
+const memoryStore = new session.MemoryStore();
 app.use(session({
-    store: new SQLiteStore({
-        db: 'sessions.sqlite',
-        dir: './db'
-    }),
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 24 * 60 * 60 * 1000 } // 24 jam
+    saveUninitialized: true,
+    store: memoryStore
+}));
+
+// Inisialisasi Keycloak
+const keycloakConfig = {
+    "realm": process.env.KEYCLOAK_REALM,
+    "auth-server-url": process.env.KEYCLOAK_URL,
+    "ssl-required": "external",
+    "resource": process.env.KEYCLOAK_CLIENT_ID,
+    "credentials": {
+        "secret": process.env.KEYCLOAK_CLIENT_SECRET
+    },
+    "confidential-port": 0
+};
+const keycloak = new Keycloak({ store: memoryStore }, keycloakConfig);
+
+// Tambahkan middleware Keycloak ke aplikasi
+app.use(keycloak.middleware({
+    // logout: '/logout', // URL logout di dalam aplikasi
+    admin: '/admin'    // URL dasar untuk area admin
 }));
 
 // Routes
 const publicRoutes = require('./routes/public');
-const adminRoutes = require('./routes/admin');
+// Kirim instance keycloak ke file route admin
+const adminRoutes = require('./routes/admin')(keycloak);
 
 app.use('/', publicRoutes);
 app.use('/admin', adminRoutes);
